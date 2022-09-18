@@ -35,7 +35,15 @@ class APIController extends Controller
     // add multiple user 
     public function addMultipleUser(Request $request){
 
-        return $request -> input();
+        $allData = $request -> input();
+        foreach ($allData['users'] as $key => $value) {
+            $uesr = new User();
+            $uesr -> name       = $value['name'];
+            $uesr -> email      = $value['email'];
+            $uesr -> password   = bcrypt($value['password']);
+            $uesr -> save();
+        }
 
+        return response() -> json(["message" => "User Added" ]);
     }
 }
