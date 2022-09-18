@@ -54,8 +54,15 @@ class APIController extends Controller
             'email'     => 'required|email|unique:users',
             'password'  => 'required'
         ];
+        $customMsg = [
+            'name.required'     => "name is required",
+            'email.required'     => "email is required",
+            'email.email'     => "valid email is required",
+            'email.unique'     => "email is exists",
+            'password.required'     => "password is required"
+        ];
 
-        $msg = Validator::make($allData, $roles);
+        $msg = Validator::make($allData, $roles, $customMsg);
 
         if($msg -> fails()){
             return response() -> json([ $msg -> errors()], 422);
@@ -77,6 +84,27 @@ class APIController extends Controller
 
         $allData = $request -> input();
 
+         // multiple data advance validation 
+         $roles = [
+            'users.*.name'      => 'required',
+            'users.*.email'     => 'required|email|unique:users',
+            'users.*.password'  => 'required'
+        ];
+        $customMsg = [
+            'users.*.name.required'     => "name is required",
+            'users.*.email.required'     => "email is required",
+            'users.*.email.email'     => "valid email is required",
+            'users.*.email.unique'     => "email is exists",
+            'users.*.password.required'     => "password is required"
+        ];
+
+        $msg = Validator::make($allData, $roles, $customMsg);
+
+        if($msg -> fails()){
+            return response() -> json([ $msg -> errors()], 422);
+        }
+
+        // data insert
         foreach ($allData['users'] as $key => $value) {
             $uesr = new User();
             $uesr -> name       = $value['name'];
