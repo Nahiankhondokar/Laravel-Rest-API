@@ -11,10 +11,10 @@ class APIController extends Controller
     public function getUsers($id = null){
        if(empty($id)){
         $user = User::get();
-        return response() -> json([ "user" => $user]);
+        return response() -> json([ "user" => $user], 200);
        }else {
         $user = User::find($id);
-        return response() -> json([ "user" => $user]);
+        return response() -> json([ "user" => $user], 200);
        }
     }
 
@@ -50,7 +50,7 @@ class APIController extends Controller
         $uesr -> password   = bcrypt($request -> password);
         $uesr -> save();
 
-        return response() -> json(["message" => "User Added" ]);
+        return response() -> json(["message" => "User Added" ], 201);
 
     }
 
@@ -67,6 +67,6 @@ class APIController extends Controller
             $uesr -> save();
         }
 
-        return response() -> json(["message" => "User Added" ]);
+        return response() -> json(["message" => "User Added" ], 201);
     }
 }
