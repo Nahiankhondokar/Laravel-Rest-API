@@ -191,5 +191,14 @@ class APIController extends Controller
     }
 
 
+    // delete user 
+    public function DeleteUser($id){
+        $delete = User::find($id);
+        $delete -> delete();
+
+        return response() -> json(["message" => "User Deleted"], 202);
+    }
+
+
 
 }
