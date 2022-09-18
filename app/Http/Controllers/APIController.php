@@ -143,6 +143,7 @@ class APIController extends Controller
             return response() -> json([ $msg -> errors()], 422);
         }
 
+        // data update
         $update = User::find($id);
         $update -> name = $request['name'];
         $update -> email = $request['email'];
@@ -151,4 +152,44 @@ class APIController extends Controller
 
         return response() -> json(["message" => "User Updated"], 202);
     }
+
+    /**
+     *  update user name by patch mathod
+     *  when we need to update only one field this time we can use PATCH method
+     */
+    public function UpdateUserName(Request $request, $id){
+
+        // get all data
+        $allData = $request -> input();
+        
+        // advance validation 
+        $roles = [
+            'name'      => 'required',
+            'email'     => 'required|email|unique:users',
+            'password'  => 'required'
+        ];
+        $customMsg = [
+            'name.required'     => "name is required",
+            'email.required'     => "email is required",
+            'email.email'     => "valid email is required",
+            'email.unique'     => "email is exists",
+            'password.required'     => "password is required"
+        ];
+
+        $msg = Validator::make($allData, $roles, $customMsg);
+
+        if($msg -> fails()){
+            return response() -> json([ $msg -> errors()], 422);
+        }
+
+        // data update
+        $update = User::find($id);
+        $update -> name = $request['name'];
+        $update -> update();
+
+        return response() -> json(["message" => "User Name Updated"], 202);
+    }
+
+
+
 }

@@ -25,3 +25,4 @@ Route::get('users/{id?}', [APIController::class, 'getUsers']);
 Route::post('add-users/', [APIController::class, 'addUsers']);
 Route::post('add-multiple-user/', [APIController::class, 'addMultipleUser']);
 Route::put('update-user/{id}', [APIController::class, 'UpdateUser']);
+Route::patch('update-user-name/{id}', [APIController::class, 'UpdateUserName']);
