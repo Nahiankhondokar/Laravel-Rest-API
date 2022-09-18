@@ -115,4 +115,40 @@ class APIController extends Controller
 
         return response() -> json(["message" => "User Added" ], 201);
     }
+
+
+    // update user
+    public function UpdateUser($id, Request $request){
+
+        // get all data
+        $allData = $request -> input();
+        
+        // advance validation 
+        $roles = [
+            'name'      => 'required',
+            'email'     => 'required|email|unique:users',
+            'password'  => 'required'
+        ];
+        $customMsg = [
+            'name.required'     => "name is required",
+            'email.required'     => "email is required",
+            'email.email'     => "valid email is required",
+            'email.unique'     => "email is exists",
+            'password.required'     => "password is required"
+        ];
+
+        $msg = Validator::make($allData, $roles, $customMsg);
+
+        if($msg -> fails()){
+            return response() -> json([ $msg -> errors()], 422);
+        }
+
+        $update = User::find($id);
+        $update -> name = $request['name'];
+        $update -> email = $request['email'];
+        $update -> password = bcrypt($request['password']);
+        $update -> update();
+
+        return response() -> json(["message" => "User Updated"], 202);
+    }
 }
