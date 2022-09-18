@@ -17,4 +17,25 @@ class APIController extends Controller
         return response() -> json([ "user" => $user]);
        }
     }
+
+
+    // add user
+    public function addUsers(Request $request){
+
+        $uesr = new User();
+        $uesr -> name       = $request -> name;
+        $uesr -> email      = $request -> email;
+        $uesr -> password   = bcrypt($request -> password);
+        $uesr -> save();
+
+        return response() -> json(["message" => "User Added" ]);
+
+    }
+
+    // add multiple user 
+    public function addMultipleUser(Request $request){
+
+        return $request -> input();
+
+    }
 }
