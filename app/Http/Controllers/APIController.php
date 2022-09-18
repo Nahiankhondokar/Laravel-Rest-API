@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class APIController extends Controller
 {
@@ -22,25 +23,42 @@ class APIController extends Controller
     // add user
     public function addUsers(Request $request){
 
-        // validation
+        // get all data
         $allData = $request -> input();
-        if(empty($allData['name']) || empty($allData['email']) || empty($allData['password']) ){
-            $err_msg  = 'All Fields are required';
-        }
 
-        if(!filter_var($allData['email'], FILTER_VALIDATE_EMAIL)){
-            $err_msg  = 'invalid email';
-        }
 
-        $user_count = User::where('email', $allData['email']) -> count();
-        if($user_count > 0){
-            $err_msg  = 'email already exists';
-            
-        }
+        // smple validation
+        
+        // if(empty($allData['name']) || empty($allData['email']) || empty($allData['password']) ){
+        //     $err_msg  = 'All Fields are required';
+        // }
 
-        // validation msg
-        if(!empty($err_msg) && isset($err_msg)){
-            return response() -> json(["message" => $err_msg, "status" => false], 422);
+        // if(!filter_var($allData['email'], FILTER_VALIDATE_EMAIL)){
+        //     $err_msg  = 'invalid email';
+        // }
+
+        // $user_count = User::where('email', $allData['email']) -> count();
+        // if($user_count > 0){
+        //     $err_msg  = 'email already exists'; 
+        // }
+
+        // // validation msg
+        // if(!empty($err_msg) && isset($err_msg)){
+        //     return response() -> json(["message" => $err_msg, "status" => false], 422);
+        // }
+
+
+        // advance validation 
+        $roles = [
+            'name'      => 'required',
+            'email'     => 'required|email|unique:users',
+            'password'  => 'required'
+        ];
+
+        $msg = Validator::make($allData, $roles);
+
+        if($msg -> fails()){
+            return response() -> json([ $msg -> errors()], 422);
         }
 
         // data insert
