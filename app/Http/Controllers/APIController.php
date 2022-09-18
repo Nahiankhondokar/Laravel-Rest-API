@@ -22,6 +22,28 @@ class APIController extends Controller
     // add user
     public function addUsers(Request $request){
 
+        // validation
+        $allData = $request -> input();
+        if(empty($allData['name']) || empty($allData['email']) || empty($allData['password']) ){
+            $err_msg  = 'All Fields are required';
+        }
+
+        if(!filter_var($allData['email'], FILTER_VALIDATE_EMAIL)){
+            $err_msg  = 'invalid email';
+        }
+
+        $user_count = User::where('email', $allData['email']) -> count();
+        if($user_count > 0){
+            $err_msg  = 'email already exists';
+            
+        }
+
+        // validation msg
+        if(!empty($err_msg) && isset($err_msg)){
+            return response() -> json(["message" => $err_msg, "status" => false], 422);
+        }
+
+        // data insert
         $uesr = new User();
         $uesr -> name       = $request -> name;
         $uesr -> email      = $request -> email;
@@ -36,6 +58,7 @@ class APIController extends Controller
     public function addMultipleUser(Request $request){
 
         $allData = $request -> input();
+
         foreach ($allData['users'] as $key => $value) {
             $uesr = new User();
             $uesr -> name       = $value['name'];
