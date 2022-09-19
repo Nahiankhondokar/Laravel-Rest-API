@@ -26,6 +26,7 @@ Route::get('user-list/', [APIController::class, 'getUserList']);
 
 Route::post('register-user/', [APIController::class, 'RegisterUser']);
 Route::get('login-user/', [APIController::class, 'LoginUser']);
+Route::get('logout-user/', [APIController::class, 'LogoutUser']);
 Route::post('add-multiple-user/', [APIController::class, 'addMultipleUser']);
 
 Route::put('update-user/{id}', [APIController::class, 'UpdateUser']);
