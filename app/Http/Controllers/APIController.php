@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -45,7 +46,7 @@ class APIController extends Controller
 
 
 
-    // add user
+    // register user
     public function RegisterUser(Request $request){
 
         // get all data
@@ -101,7 +102,7 @@ class APIController extends Controller
         $uesr -> name       = $request -> name;
         $uesr -> email      = $request -> email;
         $uesr -> password   = bcrypt($request -> password);
-        $uesr -> api_token  = $token;
+        $uesr -> access_token  = $token;
         $uesr -> save();
 
         return response() -> json(["message" => "User Registered", "token" => $token ], 201);
@@ -139,7 +140,7 @@ class APIController extends Controller
 
         if($pass_check){
             $new_token = Str::random(60);
-            User::where('email', $allData['email']) -> update(['api_token'    => $new_token]);
+            User::where('email', $allData['email']) -> update(['access_token'    => $new_token]);
 
             return response() -> json([ 
                 "user" => $user,
@@ -163,11 +164,11 @@ class APIController extends Controller
             return response() -> json([ "message" => "token is missing" ], 422);
 
         }else {
-            $api_token = str_replace('Bearer ', '', $token);
-            $api_count = User::where('api_token', $api_token) -> count();
+            $access_token = str_replace('Bearer ', '', $token);
+            $api_count = User::where('access_token', $access_token) -> count();
 
             if($api_count > 0){
-                User::where('api_token', $api_token) -> update(['api_token' => NULL]);
+                User::where('access_token', $access_token) -> update(['access_token' => NULL]);
                 return response() -> json([ "message" => "User logged out" ], 200);
             }
         }
@@ -303,6 +304,60 @@ class APIController extends Controller
         return response() -> json(["message" => "Multi User Deleted"], 202);
     }
 
+
+    // passport package controller function
+
+    // register user
+    public function RegisterUserWithPassport(Request $request){
+
+        // get all data
+        $allData = $request -> input();
+
+        // advance validation 
+        $roles = [
+            'name'      => 'required',
+            'email'     => 'required|email|unique:users',
+            'password'  => 'required'
+        ];
+        $customMsg = [
+            'name.required'     => "name is required",
+            'email.required'     => "email is required",
+            'email.email'     => "valid email is required",
+            'email.unique'     => "email is exists",
+            'password.required'     => "password is required"
+        ];
+
+        $msg = Validator::make($allData, $roles, $customMsg);
+
+        if($msg -> fails()){
+            return response() -> json([ $msg -> errors()], 422);
+        }
+
+        // token generate
+        // $token = Str::random(60);
+
+        // data insert
+        $uesr = new User();
+        $uesr -> name       = $request -> name;
+        $uesr -> email      = $request -> email;
+        $uesr -> password   = bcrypt($request -> password);
+        // $uesr -> access_token  = $token;
+        $uesr -> save();
+
+        if(Auth::attempt(['email' => $allData['email'], 'password' => $allData['password']])){
+
+            $user = User::where('email', $allData['email']) -> first();
+            $accessToken = $user -> createToken($allData['email']) -> accessToken;
+
+            return $accessToken;
+
+        }
+
+
+        // return response() -> json(["message" => "User Registered", "token" => $access_token ], 201);
+
+    }
+    
 
 
 }

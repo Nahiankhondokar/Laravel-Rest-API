@@ -34,3 +34,7 @@ Route::patch('update-user-name/{id}', [APIController::class, 'UpdateUserName']);
 
 Route::delete('delete-user/{id}', [APIController::class, 'DeleteUser']);
 Route::delete('delete-multiple-user/{ids}', [APIController::class, 'DeleteMultipleUser']);
+
+// passport package
+Route::post('register-user-passport/',
+ [APIController::class, 'RegisterUserWithPassport']);
