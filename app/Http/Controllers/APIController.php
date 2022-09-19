@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class APIController extends Controller
 {
     // get single user
-    public function getUsers($id = null){
+    public function UserRegister($id = null){
        if(empty($id)){
         $user = User::get();
         return response() -> json([ "user" => $user], 200);
@@ -44,7 +46,7 @@ class APIController extends Controller
 
 
     // add user
-    public function addUsers(Request $request){
+    public function RegisterUser(Request $request){
 
         // get all data
         $allData = $request -> input();
@@ -91,14 +93,64 @@ class APIController extends Controller
             return response() -> json([ $msg -> errors()], 422);
         }
 
+        // token generate
+        $token = Str::random(60);
+
         // data insert
         $uesr = new User();
         $uesr -> name       = $request -> name;
         $uesr -> email      = $request -> email;
         $uesr -> password   = bcrypt($request -> password);
+        $uesr -> api_token  = $token;
         $uesr -> save();
 
-        return response() -> json(["message" => "User Added" ], 201);
+        return response() -> json(["message" => "User Registered", "token" => $token ], 201);
+
+    }
+
+    // login user 
+    public function LoginUser(Request $request){
+
+        // get all data
+        $allData = $request -> input();
+
+        // advance validation 
+        $roles = [
+            'email'     => 'required|email|exists:users',
+            'password'  => 'required'
+        ];
+        $customMsg = [
+            'email.required'        => "email is required",
+            'email.email'           => "valid email is required",
+            'email.unique'          => "email is exists",
+            'password.required'     => "password is required"
+        ];
+
+        $msg = Validator::make($allData, $roles, $customMsg);
+
+        if($msg -> fails()){
+            return response() -> json([ $msg -> errors()], 422);
+        }
+
+        // user login
+        $user = User::where('email', $allData['email']) -> first();
+        // $pass_verify = Hash::check($allData['password'], $user -> password);
+        $pass_check = \password_verify($allData['password'], $user -> password);
+
+        if($pass_check){
+            $new_token = Str::random(60);
+            User::where('email', $allData['email']) -> update(['api_token'    => $new_token]);
+
+            return response() -> json([ 
+                "user" => $user,
+                "message" => "user loggedin",
+                "token"     => $new_token
+            ], 200);
+
+        }else {
+            return response() -> json([ "message" => "password incorrect" ], 422);
+        }
+
 
     }
 

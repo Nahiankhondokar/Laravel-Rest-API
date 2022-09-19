@@ -24,7 +24,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('users/{id?}', [APIController::class, 'getUsers']);
 Route::get('user-list/', [APIController::class, 'getUserList']);
 
-Route::post('add-users/', [APIController::class, 'addUsers']);
+Route::post('register-user/', [APIController::class, 'RegisterUser']);
+Route::get('login-user/', [APIController::class, 'LoginUser']);
 Route::post('add-multiple-user/', [APIController::class, 'addMultipleUser']);
 
 Route::put('update-user/{id}', [APIController::class, 'UpdateUser']);
