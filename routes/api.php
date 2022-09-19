@@ -22,8 +22,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // user API 
 Route::get('users/{id?}', [APIController::class, 'getUsers']);
+Route::get('user-list/', [APIController::class, 'getUserList']);
+
 Route::post('add-users/', [APIController::class, 'addUsers']);
 Route::post('add-multiple-user/', [APIController::class, 'addMultipleUser']);
+
 Route::put('update-user/{id}', [APIController::class, 'UpdateUser']);
 Route::patch('update-user-name/{id}', [APIController::class, 'UpdateUserName']);
+
 Route::delete('delete-user/{id}', [APIController::class, 'DeleteUser']);
+Route::delete('delete-multiple-user/{ids}', [APIController::class, 'DeleteMultipleUser']);

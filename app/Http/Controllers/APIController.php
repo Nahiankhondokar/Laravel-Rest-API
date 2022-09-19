@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class APIController extends Controller
 {
-    // get all user
+    // get single user
     public function getUsers($id = null){
        if(empty($id)){
         $user = User::get();
@@ -18,6 +18,29 @@ class APIController extends Controller
         return response() -> json([ "user" => $user], 200);
        }
     }
+
+    // get all user
+    public function getUserList(Request $request){
+
+        // return $request -> header('Authorization');
+
+        $token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        $header = $request -> header('Authorization');
+        if(!empty( $header)){
+            if($header == $token){
+                $user = User::all();
+                return response() -> json([ "user" => $user], 200);
+            }else {
+                return response() -> json([ "message" => "Invalid token"], 422);
+            }
+        }else {
+            return response() -> json([ "message" => "Your are not authoraized"], 422);
+        }
+
+        
+
+    }
+
 
 
     // add user
@@ -197,6 +220,15 @@ class APIController extends Controller
         $delete -> delete();
 
         return response() -> json(["message" => "User Deleted"], 202);
+    }
+
+    // delete multiple user
+    public function DeleteMultipleUser($ids){
+
+        $multi_id = explode(',', $ids);
+        User::whereIn('id', $multi_id) -> delete();
+
+        return response() -> json(["message" => "Multi User Deleted"], 202);
     }
 
 
